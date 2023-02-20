@@ -15,7 +15,14 @@ import lombok.Getter;
 public class GoogleOAuthHelper {
 	
 	private static final String GOOGLE_OAUTH_AUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
-	private static final String GOOGLE_OAUTH_TOKEN_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/token";
+	private static final String GOOGLE_OAUTH_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
+	
+	public enum GoogleOAuthTokenRequestParams{
+		client_id, client_secret, code, grant_type,redirect_uri
+	}
+	public enum GoogleOAuthTokenRequestGrantTypes{
+		authorization_code
+	}
 	
 	public enum GoogleOAuthAuthUrlError{
 		admin_policy_enforced("Sign-in in not allowed because your organization's Google Workspace policy does not allow this feature currently."),
@@ -93,6 +100,10 @@ public class GoogleOAuthHelper {
 		return "code";
 	}
 	
+	public String getAuthResponseStateKey() {
+		return "state";
+	}
+	
 	public GoogleOAuthAuthUrlError asAuthUrlError(String errorCode) {
 		return GoogleOAuthAuthUrlError.valueOf(errorCode);
 	}
@@ -107,6 +118,7 @@ public class GoogleOAuthHelper {
 	 * @param requestData
 	 * @return
 	 */
+	@Deprecated
 	public String buildTokenUrl(GoogleOAuthTokenRequestData requestData) {
 		StringBuilder sb = new StringBuilder(500);
 		
@@ -118,6 +130,10 @@ public class GoogleOAuthHelper {
 		sb.append("&").append("redirect_uri=").append( encode(requestData.getRedirectUri()) );
 		
 		return sb.toString();
+	}
+	
+	public String getTokenEndpoint() {
+		return GOOGLE_OAUTH_TOKEN_ENDPOINT;
 	}
 	
 	public GoogleOAuthTokenResponseData parseOAuthTokenResponse(String tokenResponseJson) {
